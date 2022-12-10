@@ -1,26 +1,65 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, ChangeEvent } from "react";
+import "./App.css";
+import TodoTask from "./components/TodoTask";
+import { ITask } from "./Interfaces";
 
-function App() {
+const App: React.FC = () => {
+  const [isTask, setIsTask] = useState<string>("");
+  const [isDeadline, setIsDeadLine] = useState<number>(0);
+  const [isTodoList, setIsTodoList] = useState<ITask[]>([]);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    if (event.target.name === "task") {
+      setIsTask(event.target.value);
+    } else {
+      setIsDeadLine(Number(event.target.value));
+    }
+  };
+
+  const addTask = (): void => {
+    const newTask = { taskName: isTask, deadLine: isDeadline };
+    setIsTodoList([...isTodoList, newTask]);
+    setIsTask("");
+    setIsDeadLine(0);
+  };
+
+  const completeTask = (taskNameToDelete: string): void => {
+    setIsTodoList(
+      isTodoList.filter((isTask) => {
+        return isTask.taskName !== taskNameToDelete;
+      })
+    );
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="header">
+        <div className="inputContainer">
+          <input
+            type="text"
+            placeholder="Task..."
+            onChange={handleChange}
+            name="task"
+            value={isTask}
+          />
+          <input
+            type="number"
+            placeholder="Deadlines (in days...)"
+            onChange={handleChange}
+            name="deadline"
+            className="input-align"
+            value={isDeadline}
+          />
+        </div>
+        <button onClick={addTask}>Add Task</button>
+      </div>
+      <div className="todoList">
+        {isTodoList.map((task: ITask, key: number) => {
+          return <TodoTask key={key} task={task} completeTask={completeTask} />;
+        })}
+      </div>
     </div>
   );
-}
+};
 
 export default App;
